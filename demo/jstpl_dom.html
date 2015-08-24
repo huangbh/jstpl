@@ -1,0 +1,46 @@
+<html>
+	<script type="text/javascript" src="../src/jstpl-2.0.1.js"></script>
+	<!-- 
+		dom版本就是把js代码放入 <% %>中
+	 -->
+	<script type="text/jstpl" id="tpl_item" jstpl="item"> 
+			<%for(var i=3;i>0;i--){%> 
+				{item.c}--{i}
+			<%}%>
+	</script>
+	<!-- 
+		另外如果文本不需要解析,在func版本中是重复了一个*
+		在dom版本中是在判断第一个字符是否为%
+		其他的均是相同的
+	 -->
+	<script type="text/jstpl" id='tpl_demo'>%<span>{THIS IS A DEMO}</span><br>
+			<%
+				var ls=data.list;
+			%><h>title is {data.title}</h>
+			<%
+			for(var i=0,len=ls.length; i< len; i ++){
+				var item=ls[i];
+				%>\var data=\<div>hello {item.a + ls[i].b};</div>
+				<%data = _(%>/{A}{data}{B}<%);%>
+				<p>{$tpl('tpl_item')(item)}{data}</p>
+			<% } %>
+			<span>done<span>
+	</script>
+	<script type="text/javascript">
+		function show_demo(node){
+			var data={
+				title:"JSTPL DEMO",
+				list:[
+					{a:100, b:102, c:'number'},
+					{a:'ab',b:'cd', c:'string'}
+				]
+			};
+			alert($tpl("item","<%for(var i=3;i>0;i--){%>{item.c}--{i}<%}%>")(data.list[0]));
+			var html = $tpl('tpl_demo')(data);
+			node.innerHTML=html;
+		}
+	</script>
+<body onload="show_demo(document.getElementById('demo'))">
+	<div id="demo"></div>
+</body>
+</html>

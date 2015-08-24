@@ -1,0 +1,49 @@
+<html>
+	<script type="text/javascript" src="../src/jstpl-2.0.1.js"></script>
+	<script type="text/javascript">
+		function tpl_item(item){
+			//完全自由的js代码
+			for(var i=3;i>0;i--){
+				//注释就是模板内容, {} 中间的内容是js能访问的表达式
+				/*{item.c}--{i}*/
+			}
+		}
+		// 注释多一个*号变成/**, 则表示里面的{}完全不解析,这样也能加速模板的处理
+		function tpl_demo(data){
+			/**<span>{THIS IS A DEMO}</span><br>*/
+			// N 表示一个换行符,方便而已
+			/*<h>title is {data.title}</h>{N}*/
+			var ls=data.list;
+			for(var i=0,len=ls.length; i< len; i ++){
+				var item=ls[i];
+				//注释后面紧跟一个\转义符号,则在第二个\之前的内容,其实就是js代码,
+				//这样的结果就是注释的内容将不会被直接输出,而是可以被任意赋值
+				//如以下就是被赋值到一个叫data的变量中
+				/*\var data=\<div>hello {item.a + ls[i].b};</div>*/
+				//注释后紧跟一个/,则表明这个内容将被放入不定参数的函数调用中,
+				//比如这里的 _(...), 就是一个系统提供的不定参数字符串合并函数,
+				data = _(/*/{A}{data}{B}*/);
+				//{}中的内容既然是js表达式,自然就可以用$tpl(...)(...)来实现模板嵌套啦
+				//其实跟在外面调用一样的.
+				/*<p>{$tpl(tpl_item)(item)}{data}</p>*/
+			}
+			/*<span>done<span>*/
+		}
+		function show_demo(node){
+			var data={
+				title:"JSTPL DEMO",
+				list:[
+					{a:100, b:102, c:'number'},
+					{a:'ab',b:'cd', c:'string'}
+				]
+			};
+			alert($tpl(function(item){for(var i=3;i>0;i--){/*{item.c}--{i}*/}})(data.list[0]));
+			var html = $tpl(tpl_demo)(data);
+			//alert(html);
+			node.innerHTML=html;
+		}
+	</script>
+<body onload="show_demo(document.getElementById('demo'))">
+	<div id="demo"></div>
+</body>
+</html>
