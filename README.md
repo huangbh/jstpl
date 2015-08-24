@@ -34,8 +34,11 @@
 		var html_dom = tpl_dom(data);
 	
 	以上调用, 会产生相同的结果
+	
 	请注意到函数的参数和 DOM 模板的 jstpl 属性,都是模板的参数定义,是可以有无限多个的,逗号隔开即可.
 	你甚至可以在模板里使用 arguments ,以获取随意长的不定参数
+	function tpl_test(arg1,arg2){/*{arg1}/{arg2}/{arguments.length}*/}
+	
 	另外 DOM 模式下, jstpl 属性如果没有,将缺省给一个参数名为 data:
 	<script type="text/jstpl" id="tpl_test_dom">{data}</script>
 
