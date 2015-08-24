@@ -1,5 +1,5 @@
-# jstpl
-极速 JavaScript Template Engine
+#  JSTPL
+极速 JavaScript Template Engine V2.0.1 ( 最新)
 
 第一章 基本示例
 
