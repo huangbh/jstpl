@@ -1,0 +1,16 @@
+{
+  "name": "jstpl",
+  "version": "2.0.1",
+  "homepage": "https://github.com/huangbh/jstpl",
+  "authors": [
+    "laohuang (1486736561@qq.com)"
+  ],
+  "description": "极速JavaScript模板引擎",
+  "main": "dist/jstpl-2.0.1.min.js",
+  "keywords": [
+    "jstpl",
+    "laohuang",
+    "huangbh"
+  ],
+  "license": "MIT"
+}
