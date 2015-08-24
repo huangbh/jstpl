@@ -1,4 +1,4 @@
-#  JSTPL 2.0.1
+#  JSTPL 2.0.1 [![Download](https://codeload.github.com/huangbh/jstpl/zip/master)]
 极速 JavaScript Template Engine V2.0.1 (最新)
 
 ##第一章 基本示例
