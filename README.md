@@ -18,7 +18,7 @@
 		var data={title:"JSTPL", list:[{id:1,name:"laohuang"},{id:2,name:"JSTPL"}]}
 		var tpl_func = $tpl(tpl_test_func);
 		var html_func = tpl_func(data); 
-
+		
 	第二种,DOM声明:
 	<script type="text/jstpl" id="tpl_test_dom" jstpl="mydata">
 		title is :{mydata.title}
@@ -41,7 +41,7 @@
 	
 	另外 DOM 模式下, jstpl 属性如果没有,将缺省给一个参数名为 data:
 	<script type="text/jstpl" id="tpl_test_dom">{data}</script>
-
+	
 
 ##第二章 基本语法
 	
@@ -53,7 +53,13 @@
 	而DOM声明模式下恰好相反, 所有的js代码都放在 <% %> 中间,
 	告诉大家一个秘密,其实解析时,
 	不过是把函数式中的/*和*/换成了 %>和<%而已,剩下的就好理解了.
-
+	
+	对于函数式而言,简单用法可以如下:
+	var str = $tpl(function(mydata){if(mydata){/*{mydata}*/}})("laohuang");
+	
+	对于DOM 方式而言,简单用法可以直接用文本解决:
+	var str = $tpl("mydata", "<%if(mydata){%>{mydata}<%}%>")("JSTPL");
+	
 ##第三章 转义处理
 	
 	对于有些模板文本, 其实大家不希望解析, 尤其存在{} 这类特殊字符时
