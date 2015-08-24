@@ -19,20 +19,20 @@
 		var tpl_func = $tpl(tpl_test_func);
 		var html_func = tpl_func(data); 
 
-第二种,DOM声明:
-<script type="text/jstpl" id="tpl_test_dom">
-	title is :{data.title}
-	<% for(var i=0;i<ls.length;i++){ 
-	%> id is {ls[i].id} and name is {ls[i].name}
-	<% } %>%
-	good work!
-</script>
-
-其调用方式如下:
-	var tpl_dom = $tpl('tpl_test_dom');
-	var html_dom = tpl_dom(data);
-
-以上调用, 会产生相同的结果
+	第二种,DOM声明:
+	<script type="text/jstpl" id="tpl_test_dom">
+		title is :{data.title}
+		<% for(var i=0;i<ls.length;i++){ 
+		%> id is {ls[i].id} and name is {ls[i].name}
+		<% } %>%
+		good work!
+	</script>
+	
+	其调用方式如下:
+		var tpl_dom = $tpl('tpl_test_dom');
+		var html_dom = tpl_dom(data);
+	
+	以上调用, 会产生相同的结果
 
 
 第二章 基本语法
