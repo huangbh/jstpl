@@ -20,9 +20,10 @@
 		var html_func = tpl_func(data); 
 
 	第二种,DOM声明:
-	<script type="text/jstpl" id="tpl_test_dom">
-		title is :{data.title}
-		<% for(var i=0;i<ls.length;i++){ 
+	<script type="text/jstpl" id="tpl_test_dom" jstpl="mydata">
+		title is :{mydata.title}
+		<% var ls=mydata.list; 
+		for(var i=0;i<ls.length;i++){ 
 		%> id is {ls[i].id} and name is {ls[i].name}
 		<% } %>%
 		good work!
@@ -33,6 +34,10 @@
 		var html_dom = tpl_dom(data);
 	
 	以上调用, 会产生相同的结果
+	请注意到函数的参数和 DOM 模板的 jstpl 属性,都是模板的参数定义,是可以有无限多个的,逗号隔开即可.
+	你甚至可以在模板里使用 arguments ,以获取随意长的不定参数
+	另外 DOM 模式下, jstpl 属性如果没有,将缺省给一个参数名为 data:
+	<script type="text/jstpl" id="tpl_test_dom">{data}</script>
 
 
 ##第二章 基本语法
