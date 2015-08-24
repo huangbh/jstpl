@@ -147,7 +147,28 @@
 	只是你只有一种办法来自己控制添加数据, 那就是H=H.concat(...)函数
 	其他的都不支持.
 	
-##第七章 王婆卖瓜
+##第七章 模板嵌套
+	
+	模板嵌套有两种方式
+	一种是直接调用$ tpl(...) 的方式,这种方式有点 hard code 的味道,
+		不过简单粗暴直接,简单情况下是不错的.例如:
+		/*{$tpl(my_tpl_func)(data)}*/
+		
+	另一种是采取模板参数化方式,具体例子如下:
+		function tpl_panel(data, nested){
+			/*<div>
+				<span>{data.title}</span>
+				<div>{nested(data.list)}</div>
+			</div>*/
+		}
+		在调用的时候可以这样:
+		var tpl_nested = ...// 可以来自function 或 DOM, 
+		var html = $tpl(tpl_panel)(data,tpl_nested);
+		
+	这么一来, jstpl 就能完成所有可以想象的模板功能了,你甚至可以由此引入各种运行时环境.
+	
+	
+##第八章 王婆卖瓜
 	
 	1,本模板的实现不依赖于任何其他框架
 	2,经过测试,目前为止本模板的解析与渲染速度表现最好
