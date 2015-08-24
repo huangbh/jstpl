@@ -3,21 +3,21 @@
 
 第一章 基本示例
 
-本引擎支持两种方式的模板定义:
-第一种, 函数式:
-function tpl_test_func(mydata){
-	/* title is: {mydata.title} 
-	*/
-	var ls=mydata.list;
-	for(var i=0;i<ls.length;i++){
-		/* id is {ls[i].id} and name is {ls[i].name} {N}*/ 
+	本引擎支持两种方式的模板定义:
+	第一种, 函数式:
+	function tpl_test_func(mydata){
+		/* title is: {mydata.title} 
+		*/
+		var ls=mydata.list;
+		for(var i=0;i<ls.length;i++){
+			/* id is {ls[i].id} and name is {ls[i].name} {N}*/ 
+		}
+		/** good work! */
 	}
-	/** good work! */
-}
-然后调用方式如下:
-	var data={title:"JSTPL", list:[{id:1,name:"laohuang"},{id:2,name:"JSTPL"}]}
-	var tpl_func = $tpl(tpl_test_func);
-	var html_func = tpl_func(data); 
+	然后调用方式如下:
+		var data={title:"JSTPL", list:[{id:1,name:"laohuang"},{id:2,name:"JSTPL"}]}
+		var tpl_func = $tpl(tpl_test_func);
+		var html_func = tpl_func(data); 
 
 第二种,DOM声明:
 <script type="text/jstpl" id="tpl_test_dom">
