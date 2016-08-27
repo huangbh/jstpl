@@ -17,7 +17,8 @@
 <script src="template_test_files/jquery.js"></script>
 <script src="template_test_files/easytemplate.js"></script>
 <script src="template_test_files/underscore.js"></script>
-<script src="../dist/jstpl-2.0.1.min.js"></script>
+<!--script src="../dist/jstpl-2.0.1.min.js"></script-->
+<script src="../src/jstpl-2.1.0.js"></script>
 
 <script>
 // 数据量
@@ -117,12 +118,13 @@ var testList = {list:[
         render: function () {
             var source = document.getElementById('jstpl').innerHTML;
             var fn = $tpl("list",source);
+            //alert(fn);
             for (var i = 0; i < number; i ++) {
                 fn(data);
             }
         }
     },
-    /*
+    //*
     {
         name: 'artTemplate',
         tester: function () {
@@ -155,7 +157,7 @@ var testList = {list:[
             // }
         }
     },
-    */
+   // */
     {
         name: 'juicer',
         tester: function () {
@@ -213,8 +215,8 @@ var testList = {list:[
             }
         }
     }
-    /*
-    {
+    //*
+    ,{
         name: 'Handlebars',
         tester: function () {
             var source = document.getElementById('Handlebars').innerHTML;
@@ -341,10 +343,11 @@ var testList = {list:[
                 var html1 = fun(data);
             }
         }
-    },
-    */
+    }
+    //*/
      // jqueryTmpl 太慢，可能导致浏览器停止响应
-    /*{
+    /*
+    ,{
         name: 'jqueryTmpl',
         tester: function () {
             var source = document.getElementById("jqueryTmpl").innerHTML;
@@ -379,7 +382,7 @@ var testList = {list:[
             }
         }
     }
-    */
+    //*/
 ]};
 /*
 KISSY.use('template',function(S,T) {
@@ -408,7 +411,7 @@ KISSY.use('template',function(S,T) {
     });
 });
 
-*/
+//*/
 
 var startComp = function () {
 
@@ -910,6 +913,7 @@ var startTest = function () {
 
 <p>
     <em>建议在拥有 v8 javascript 引擎的 chrome 浏览器上进行测试，避免浏览器停止响应</em>
+    <a href="../demo/jstpl_dom.html" target='_blank'>demo jstpl dom</a> | <a href="../demo/jstpl_func.html" target='_blank'> demo jstpl func </a>
 </p>
 
 <p>

@@ -1,12 +1,21 @@
 <html>
-	<script type="text/javascript" src="../src/jstpl-2.0.1.js"></script>
+	<script type="text/javascript" src="../src/jstpl-2.1.0.min.js"></script>
 	<script type="text/javascript">
+		 
+		function tpl_nested(nested){
+				/**<span>*/
+				/*{nested(100)}*/
+				/*aaa*/
+		}
 		function tpl_item(item){
 			//完全自由的js代码
 			for(var i=3;i>0;i--){
 				//注释就是模板内容, {} 中间的内容是js能访问的表达式
 				/*{item.c}--{i}*/
 			}
+			$tpl(tpl_nested)($tpl(function(data){
+				/*--{data}--*/
+			}));
 		}
 		// 注释多一个*号变成/**, 则表示里面的{}完全不解析,这样也能加速模板的处理
 		function tpl_demo(data){

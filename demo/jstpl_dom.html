@@ -1,5 +1,5 @@
 <html>
-	<script type="text/javascript" src="../src/jstpl-2.0.1.js"></script>
+	<script type="text/javascript" src="../src/jstpl-2.1.0.min.js"></script>
 	<!-- 
 		dom版本就是把js代码放入 <% %>中
 	 -->
@@ -35,7 +35,7 @@
 					{a:'ab',b:'cd', c:'string'}
 				]
 			};
-			alert($tpl("item","<%for(var i=3;i>0;i--){%>{item.c}--{i}<%}%>")(data.list[0]));
+			alert($tpl("item","{\\aaa}<%for(var i=3;i>0;i--){%>{item.c}--{i}<%}%>")(data.list[0]));
 			var html = $tpl('tpl_demo')(data);
 			node.innerHTML=html;
 		}

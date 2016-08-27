@@ -9,7 +9,7 @@
  * JSTPL用来生成页面, $tpl(tplfunc)(...) 
  * 
  * @author huang benhua (黄本华) 
- * @email 1486736561@qq.com
+ * @email 24860657@qq.com
 */
 
 //JSTPL

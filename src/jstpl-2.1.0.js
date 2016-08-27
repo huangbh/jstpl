@@ -1,5 +1,5 @@
 /**
- * JSTPL, 极速javascript template engine version 2.0.1
+ * JSTPL, 极速javascript template engine version 2.1.0
  * https://github.com/huangbh/jstpl
  * 完全免费,随便使用,神马BSD协议是随便选的,
  * 只是希望大家尽量保留前面的注释,你懂的...
@@ -13,19 +13,28 @@
  *   $tpl(args, body)(...)
  *   $tpl(domid)(...)
  * 
+ * 版本2.1
+ * 升级为nodejs可以使用的modules 
+ * 并提供内部函数和共享空间
+ *
  * @author huang benhua (黄本华) 
  * @email 24860657@qq.com
 */
 
 //JSTPL
-!function($win,$ie,$newfunc){
+!function(INITIALIZER){
+    //初始化基础环境
+    var $env={$template:function(txt,in_dom){return txt;}};
+    INITIALIZER=INITIALIZER($env);
+    var USE_TOKEN_ARRAY=INITIALIZER.use_token_array||0;
     /*
     * 产生JavaScript Code String 风格的字符串生成函数
+    * USE_TOKEN_ARRAY, 只有在老版本的ie才需要
     */
     var rp_strs={'\"':'\\"',"\'":"\\'",'\r':'\\r','\n':'\\n','\\':'\\\\'};
     //var rp_match=/[\\\\\"\'\r\n\t\b\&\f]|[^\\\\\"\'\r\n\t\b\&\f]+/g;
     var rp_match=/[\\\\\"\'\r\n]|[^\\\\\"\'\r\n]+/g;
-    var _jstr=$ie?function(s){
+    var _jstr=USE_TOKEN_ARRAY?function(s){
         var ar=s.match(rp_match),l=ar.length,i=0,p,rps=rp_strs; 
         while(i < l){
             if(ar[i].length==1){
@@ -48,7 +57,7 @@
     * 合并一个数组到字符串
     * 当然是专门针对IE做了个优化
     */
-    var _combx=$ie?function(as,i,l,h){ 
+    var _combx=USE_TOKEN_ARRAY?function(as,i,l,h){ 
         if(!l)return h;
         h=h?[h]:[];
         while(i<l) h.push(as[i++]); 
@@ -69,14 +78,15 @@
     * 这是个纯内部使用的函数,专门用以分解一对分隔符之间的内容,直到分解完毕
     **/
     function _sp2(s,p,f,x,b,_d){
-        var i,n=0,fc;
+        var i,n=0,fc,jb;
         while(s.length){
             i=s.indexOf(p[b]);
             if(i<0)i=s.length;
             if(i){
                 if(b){
                     fc=s.charAt(0);
-                    f(s.substr(0,i),1,n++,(fc==x)?0:fc,_d);
+                    jb=(fc==x)?1:0;
+                    f(s.substring(jb,i),1,n++,jb?0:fc,_d);
                 }else{
                     f(s.substr(0,i),0,n++,0,_d);
                 }
@@ -99,10 +109,17 @@
      * N 表示 \n
      * X 表示 *
      * P 表示 %
+     * 
+     * C 表示为this
+     * S 表示arguments
+     * T 表示为当前模板
+     *
      * 实在要自行做内容添加怎么办呢? 有一个办法,就是 H=H.concat(...)函数!
      * 这是因为js中,String和Array都有这个方法,且语法一样,当然不建议这么干...,原因么,你懂的
      */
-    var _prefix=($ie?'var H=[]':'var H=""')+',J=$tpl,N="\\n",A="{",B="}",R="\\r",_=J._comb,X="*",P="%";';
+    var _prefix=(USE_TOKEN_ARRAY?'var H=[]':'var H=""')
+    + ',S=arguments,T=S.callee,$tpl=T._$tpl,J=T._$env,C=this' 
+    + ',N="\\n",A="{",B="}",R="\\r",_=$tpl._comb,X="*",P="%";';
  
     /**
     * 解析函数
@@ -131,9 +148,13 @@
     * 优化的模板编译函数,输入一个原始函数体,输出模板函数体
     */
     var _compile;
-    if($ie){
+    if(USE_TOKEN_ARRAY){
         _compile=function(s,sp2,ig,b){
+            s=$env.$template(s,b);
             var c=[_prefix];
+            if($env.$tpl_prefix){
+                c.push($env.$tpl_prefix);
+            }
             _analy(s,sp2,ig,b,function(x,i,j,w,_ex){
                 function _build_ie(s,b,n,fc){  
                     if(n){
@@ -165,8 +186,12 @@
             return c.join('');
         }
     }else{
-        _compile=function(s,sp2,ig,b){ 
+        _compile=function(s,sp2,ig,b){
+            s=$env.$template(s,b);
             var c=_prefix;
+            if($env.$tpl_prefix){
+                c += $env.$tpl_prefix;
+            }
             _analy(s,sp2,ig,b,function(x,i,j,w,_ex){
                 function _build(s,b,n,fc){
                     if(i){
@@ -174,7 +199,7 @@
                             c+=',';  
                         }else{
                             if(j)c+=j;
-                            c+='J._combx([';
+                            c+='$tpl._combx([';
                         }
                     }else{
                         if(!w)c+='H+=';
@@ -206,55 +231,157 @@
         }
     }
     function _none(){return "";}
+    _none._$tpl=1;
+
     /**
     * 模板生成函数,输入一个原始函数及函数生成器,生成原始函数的模板函数
     */
-    function _create_jstpl_dom(args,dom,newfunc,n){
-        if(!dom)return _none;
-        if(dom&&!dom.charAt){
-            n=dom; 
-            if(n._jstpl) return n._jstpl;
-            args=n.getAttribute('jstpl')||'data';
-            dom=n.innerHTML;
-            if($ie)dom=dom.replace(/^[\r\n]+/,'');
-        }
-        var f=newfunc(args, _compile(dom, ['%>','<%'], '%', 1));
-        f._is_jstpl=1;
-        if(n)n._jstpl=f;
+    function _create_jstpl_txt(args,txt,func_creator,_$tpl){
+        var f=func_creator(args, _compile(txt, ['%>','<%'], '%', 1));
+        f._$tpl=_$tpl;
+        f._$env=$env;
         return f;
     }
-    function _create_jstpl_func(f,newfunc){
-        if(!f)return _none;
+    function _create_jstpl_func(f,func_creator,_$tpl,n){
+        n=f;
         var s=f.toString(),i=s.indexOf('{'),a=s.substr(0,i);
         s=_compile(s.substr(i+1,s.length-i-2),['/*','*/'],'*',0);
         i=a.indexOf('(');
-        f=newfunc(a.substring(i+1,a.indexOf(')',i)), s);
-        f._is_jstpl=1;
+        f=func_creator(a.substring(i+1,a.indexOf(')',i)), s);
+        f._$tpl=_$tpl;
+        f._$env=$env;
+        n._jstpl=f;
         return f;
     }
-    function _init(win,newfunc){
+    function _create_jstpl_dom(args,dom,func_creator,_$tpl,n){ 
+        n=dom; 
+        args=n.getAttribute(args||'jstpl')||'data';
+        dom=n.innerHTML;
+        if(USE_TOKEN_ARRAY)dom=dom.replace(/^[\r\n]+/,''); 
+        var f=_create_jstpl_txt(args, dom, func_creator,_$tpl);
+        n._jstpl=f;
+        return f;
+    }
+    function _create_jstpl(func_creator, node_loader){
         function _jstpl(af,c){
-            if(af.charAt){
-                if(!c){
-                    c=win.document.getElementById(af);
+            if(!af || af.charAt){
+                if(c && c.charAt){
+                    return _create_jstpl_txt(af||'data',c,func_creator,_jstpl);
                 }
-                return _create_jstpl_dom(af,c,newfunc);
+                if(node_loader){
+                    if(!c)c=node_loader(af);
+                    if(c){
+                        if(c._jstpl) return c._jstpl;
+                        return _create_jstpl_dom(0,c,func_creator,_jstpl);
+                    }
+                }
+                if(!af)return _none;
+                if(!c) return _create_jstpl_txt('data', af, func_creator,_jstpl);
+                return _none;//_create_jstpl_txt(af, c + '',func_creator);//不接受其他类型数据,没有意义
             }
-            if(af._is_jstpl)return af;
-            if(c || !af._jstpl){
-                af._jstpl = _create_jstpl_func(af,newfunc);
+            if(af._$tpl)return af;
+            if(af._jstpl && !c)return af._jstpl;
+            if(node_loader && af.getTagName){
+                return _create_jstpl_dom(c,af,func_creator,_jstpl);//这种情况下允许自己指定参数属性名
             }
-            return af._jstpl;
+            return _create_jstpl_func(af,func_creator,_jstpl);
         }
         _jstpl._comb = _comb;
         _jstpl._combx = _combx;
-        _jstpl._init=_init;
-        win.$tpl=_jstpl;
+        _jstpl.J=_jstpl.set=function(k,v){
+            switch(arguments.length){
+                case 0:break;
+                case 1:{
+                    for(var p in k){
+                        $env[p] = k[p];
+                    }
+                };break;
+                default:
+                    $env[k]=v;
+            }
+            return $env;
+        };
+        return _jstpl;
+    }
+    INITIALIZER(_create_jstpl);
+}(function($env){
+    function func_creator(a,b){
+        //alert(b);
+        //console.log(b);
+        //try{
+            if($env.use_with){
+                b='with(arguments[0]){' + b + '}';
+            }
+            var f=new Function(a, b);
+            f.render=function(){
+                return f.apply(this||f,arguments);
+            };
+            return f;
+        //}catch(e){alert(e);}
+    }
+    try{if(window){
+        function initializer(create_jstpl){
+            function _init(win, fc){
+                var jstpl=create_jstpl(func_creator, function(n){
+                    return n?win.document.getElementById(n):0;
+                });
+                jstpl._init = _init;
+                win.$tpl=jstpl; 
+            }
+            _init(window, func_creator);
+        };
+        initializer.use_token_array=(!-[1,]);
+        return initializer;
+    }}catch(ex){console.log('JSTPL initializing in Node.js...');}
+    return function(create_jstpl){ 
+        var jstpl = create_jstpl(func_creator);
+        var fs=require('fs');
+        var views={};
+        $env.use_with = 1;//在nodejs上缺省用这个
+        $env.suffix='.htm';
+        $env.$tpl_prefix="function $include(_p,_d){return $tpl.view(_p).apply(C,_d?_d:S);};";
+        
+        jstpl.view=function(path,reload){
+            var v = views[path];
+            if(!v || reload){
+                v = fs.readFileSync(($env.root||'') + '/' + path + ($env.suffix||'.htm'));
+                v = v?v.toString():0;
+                //console.log(v);
+                v = jstpl($env.args||'data', v);
+                //console.log(v);
+                if(!$env.debug){
+                    views[path] = v;
+                }
+            }
+            return v;
+        };
+        jstpl.render=function(){
+            var as=arguments;
+            return function(){
+                var htm = '',a=arguments;
+                if($env.header){
+                    htm += jstpl.view($env.header).apply(this,a);
+                }
+                for(var i=0;i<as.length;i++){
+                    htm += jstpl.view(as[i]).apply(this,a);
+                }
+                if($env.footer){
+                    htm += jstpl.view($env.footer).apply(this,a);
+                }
+                return htm;
+            };
+        };
+        jstpl.compile=function(txt,af,c){
+            if(af){ 
+                var v = jstpl(af,c);
+                views[txt]=v;
+                return v;
+            };
+            return jstpl($env.args||'data',txt);
+        };
+        module.exports = jstpl;
+        console.log('JSTPL initialized in Node.js.');
+        return;
     };
-    _init($win,$newfunc);
-}(window, (!-[1,]), function(a,b){
-    //alert(b);
-    //try{ 
-        return new Function(a,b);
-    //}catch(e){alert(e);}
 });
+
