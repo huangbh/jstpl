@@ -155,6 +155,7 @@
             if($env.$tpl_prefix){
                 c.push($env.$tpl_prefix);
             }
+            if($env.use_with)c.push('with(S[0]){');
             _analy(s,sp2,ig,b,function(x,i,j,w,_ex){
                 function _build_ie(s,b,n,fc){  
                     if(n){
@@ -183,6 +184,7 @@
                 }
             });
             c.push(';return H.join("");');
+            if($env.use_with)c.push('}');
             return c.join('');
         }
     }else{
@@ -192,6 +194,7 @@
             if($env.$tpl_prefix){
                 c += $env.$tpl_prefix;
             }
+            if($env.use_with)c+='with(S[0]){';
             _analy(s,sp2,ig,b,function(x,i,j,w,_ex){
                 function _build(s,b,n,fc){
                     if(i){
@@ -227,6 +230,7 @@
                 }
             });
             c+=";return H;";
+            if($env.use_with)c+='}';
             return c;
         }
     }
@@ -309,9 +313,6 @@
         //alert(b);
         //console.log(b);
         //try{
-            if($env.use_with){
-                b='with(arguments[0]){' + b + '}';
-            }
             var f=new Function(a, b);
             f.render=function(){
                 return f.apply(this||f,arguments);

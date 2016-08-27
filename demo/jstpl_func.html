@@ -1,7 +1,7 @@
 <html>
-	<script type="text/javascript" src="../src/jstpl-2.1.0.min.js"></script>
+	<script type="text/javascript" src="../dist/jstpl-2.1.0.min.js"></script>
 	<script type="text/javascript">
-		 
+		$tpl.set('use_with',true);
 		function tpl_nested(nested){
 				/**<span>*/
 				/*{nested(100)}*/
@@ -46,7 +46,7 @@
 					{a:'ab',b:'cd', c:'string'}
 				]
 			};
-			alert($tpl(function(item){for(var i=3;i>0;i--){/*{item.c}--{i}*/}})(data.list[0]));
+			alert($tpl(function(){for(var i=3;i>0;i--){/*{c}--{i}*/}})(data.list[0]));
 			var html = $tpl(tpl_demo)(data);
 			//alert(html);
 			node.innerHTML=html;
