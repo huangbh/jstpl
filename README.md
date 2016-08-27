@@ -1,4 +1,4 @@
-#  JSTPL 2.0.1 
+#  JSTPL 2.1.0 
 极速 JavaScript Template Engine V2.0.1 (最新)
 [https://codeload.github.com/huangbh/jstpl/zip/master]
 
@@ -43,6 +43,20 @@
 	另外 DOM 模式下, jstpl 属性如果没有,将缺省给一个参数名为 data:
 	<script type="text/jstpl" id="tpl_test_dom">{data}</script>
 	
+	<特别注意>
+	从2.1.0开始支持 with 方式, 只是需要做如下设置:
+	$tpl.set('use_with',true);
+	这样无论 function 还是 dom, 都可以不需要声明参数名称了,例如上面的例子,可以改写为如下:
+	function tpl_test_func(){
+		/* title is: {title} 
+		*/
+		var ls=list;
+		for(var i=0;i<ls.length;i++){
+			/* id is {ls[i].id} and name is {ls[i].name} {N}*/ 
+		}
+		/** good work! */
+	}
+	dom 是同样的, 也就是说可以不用声明 jstpl='data'了.
 
 ##第二章 基本语法
 	
@@ -108,7 +122,7 @@
 	简单介绍一下系统目前用到的单字母系统变量:
 
     H 为最终生成html的内容容器
-    J 表示为JSTPL环境
+    J 表示为JSTPL环境,也就是公共空间,外部设置的参数或函数通过它来访问
     A 表示 { 
     B 表示 }
     _ 表示为字符串合并函数 _(...)
@@ -170,8 +184,60 @@
 	H是最终输出结果存储的地方, 或许有时候你需要自己来操作这个变量(当然不建议这么干),也可以.
 	只是你只有一种办法来自己控制添加数据, 那就是H=H.concat(...)函数
 	其他的都不支持.
+
+##第八章 公用空间
 	
-##第八章 王婆卖瓜
+	为模板支持了一个公共空间, 以便于外部向模板内部传递一些公用的数据,设置或方法
+	在外部可以通过如下函数来设置:
+	$tpl.set(key,value)
+	$tpl.set({key:value,...})
+
+	$tpl.J(key,value)
+	$tpl.J({key:value,...})
+
+	可以看出 set(...) 和 J(...)等价,
+	这么做是因为在模板内部, 访问公用空间的方法就是:
+	var v = J.key;
+	var v = J.key.p1.p2;
+	var v = J.key.func(...);
+	var v = J.key(...);
+	没错,就是通过 JSTPL 环境来调用的.
+
+	当然,这里的公用空间用重要的用途,
+	比如$tpl.set('use_with',true);
+	会被用来设置模板的参数将忽略根参数名,而直接访问属性.
+	在 Node.js 环境中设置一些其他参数.
+
+##第九章 支持 Node.js
+	
+	一般引入方式如下: var $tpl = require('./jstpl');
+	在 Node.js下有如下要点:
+	0, 缺省情况下是使用 with 模式的, 
+		也就是说 $tpl.set('use_with',true);是自动执行.
+	1, 可设置视图的 root 目录, 
+		例如 $tpl.set('root', __dirname + '/views');
+	2, 可设置视图文件名的后缀, 
+		例如 $tpl.set('suffix', '.htm'); 缺省值是 .htm
+	3, 可设置视图的 header和 footer, 也是一个视图, 
+		例如 $tpl.set('header', 'myheader'); 
+		这里的 myheader 应当是在 root 目录下的 myheader.htm
+	4, 调用视图方法为: 
+		var html = $tpl.render('view1','view2',...)(mydata); 
+		这个方法会自动在前后调用 header 和 footer 视图
+	5, 单独调用任意一个视图
+		var html = $tpl.view('myview')(mydata);
+		这个方法不会自动在前后调用 header 和 footer
+	6, 缺省情况下,视图会按照路径自动缓存, 但如果设置$tpl.set('debug',true);
+		则将每次访问都重新加载,这方便于做开发
+	7, 视图内部新增了一个特殊方法,以便于嵌入其他视图
+		例如:{$include('myheader')}
+		就可以嵌入自己的视图了
+	8, 还增加了如下视图生成方法,方便于配合express的 res.render(...)
+		var tpl = $tpl.compile(txt);
+		var html = tpl.render(mydata);//目前尚未支持自动加 header 和 footer...
+
+
+##第十章 王婆卖瓜
 	
 	1,本模板的实现不依赖于任何其他框架
 	2,经过测试,目前为止本模板的解析与渲染速度表现最好
@@ -181,7 +247,7 @@
 	6,函数式模板能够借助现有的各种JavaScript 编译环境规避大多数语法问题
 	7,最终生成的模板实际是一个JavaScript函数,调用方式极度自由
 	8,非常自由的模板嵌套调用方式,能大大降低模板的代码量,便于模块化管理
-
+	9,自动判断执行环境,同时支持 Node.JS和浏览器环境
 
 
 
